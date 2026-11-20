@@ -1,0 +1,35 @@
+[gd_scene format=3 uid="uid://dltxihpr7cyfx"]
+
+[ext_resource type="Script" uid="uid://cmvfp2vumvslk" path="res://main.gd" id="0_main"]
+[ext_resource type="PackedScene" uid="uid://c7vuv3t4tndt1" path="res://player.tscn" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://baw5ubhq3kjlq" path="res://stage.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://br7frjenbuf6g" path="res://cactus_spawner.gd" id="3_spawn"]
+[ext_resource type="Script" uid="uid://cjfjgvvgrh30p" path="res://ground.gd" id="4_ground"]
+
+[node name="main" type="Node2D" unique_id=1252278135]
+script = ExtResource("0_main")
+
+[node name="Stage" parent="." unique_id=752080561 instance=ExtResource("2_0xm2m")]
+position = Vector2(69, 2)
+
+[node name="Ground" type="Node2D" parent="." unique_id=626784550]
+position = Vector2(0, 242)
+script = ExtResource("4_ground")
+
+[node name="CactusSpawner" type="Node2D" parent="." unique_id=203470188]
+position = Vector2(0, 226)
+script = ExtResource("3_spawn")
+
+[node name="Player" parent="." unique_id=667366106 instance=ExtResource("1_ig7tw")]
+position = Vector2(40, 200)
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=522879554]
+
+[node name="MessageLabel" type="Label" parent="HUD" unique_id=1328029335]
+offset_top = 90.0
+offset_right = 250.0
+offset_bottom = 130.0
+theme_override_colors/font_color = Color(0.33, 0.33, 0.33, 1)
+theme_override_font_sizes/font_size = 10
+horizontal_alignment = 1
+vertical_alignment = 1
