@@ -29,7 +29,7 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	if _attacking:
 		return
-	_time += delta
+	_time += delta * _time_scale()
 	_update_position()
 
 
@@ -49,9 +49,13 @@ func _attack() -> void:
 	_attacking = true
 	for i in flashes:
 		sprite.self_modulate = flash_color
-		await get_tree().create_timer(flash_time, false).timeout
+		await get_tree().create_timer(flash_time / _time_scale(), false).timeout
 		sprite.self_modulate = Color.WHITE
-		await get_tree().create_timer(flash_time, false).timeout
+		await get_tree().create_timer(flash_time / _time_scale(), false).timeout
 	if is_instance_valid(_spawner) and _spawner.running:
 		_spawner.add_projectile(laser_scene.instantiate(), global_position + muzzle_offset)
 	_attacking = false
+
+
+func _time_scale() -> float:
+	return _spawner.world_time_scale if is_instance_valid(_spawner) else 1.0

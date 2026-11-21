@@ -3,9 +3,9 @@ extends SceneTree
 const SHEET := "res://assets/fonts/Font-grayscale.png"
 const OUTPUT := "res://assets/fonts/pixel_font.tres"
 const FALLBACK := "res://assets/fonts/Super Arcade.ttf"
-const CHARACTERS := "PresSACEtoaHI0123456789+c"
+const CHARACTERS := "PresSACEtoaHI0123456789+cGMOVRT"
 const CELL := 32
-const COLUMNS := 5
+const COLUMNS := 6
 const SPACING := 2
 const SPACE_ADVANCE := 10
 

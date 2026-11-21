@@ -21,6 +21,8 @@ enum Obstacles { CACTI, ASTEROIDS, PIPES, PIPE_PAIRS }
 @export var min_gap_seconds := 0.8
 @export var max_gap_seconds := 1.8
 @export var night_y_range := Vector2(200.0, 200.0)
+@export var flyer_chance := 0.0
+@export var flyer_min_obstacles := 20
 @export_group("Flight")
 @export var flight := false
 @export var flap_velocity := 190.0

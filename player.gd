@@ -13,6 +13,7 @@ signal hit_ground
 @export var jump_volume_db := 12.0
 @export var death_volume_db := 8.0
 @export var blink_interval := 0.1
+@export var bounce_factor := 0.6
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: CollisionShape2D = $CollisionShape2D
@@ -148,6 +149,10 @@ func revive() -> void:
 	revived.emit()
 
 
+func bounce() -> void:
+	velocity.y = jump_velocity * bounce_factor
+
+
 func start_invincibility(duration: float) -> void:
 	_invincible_time = duration
 
@@ -202,6 +207,7 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	position.x = _home_x
+	_check_stomps()
 
 
 func _fly(delta: float) -> void:
@@ -222,8 +228,17 @@ func _fly(delta: float) -> void:
 		sprite.rotation_degrees = move_toward(sprite.rotation_degrees, mode.dive_tilt_degrees, mode.dive_tilt_speed * delta)
 	move_and_slide()
 	position.x = _home_x
+	_check_stomps()
 	if mode.floor_kills and is_on_floor() and not is_invincible():
 		hit_ground.emit()
+
+
+func _check_stomps() -> void:
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		var collider := collision.get_collider() as Node
+		if collider and collision.get_normal().y < -0.5 and collider.get_parent().has_method("stomp"):
+			collider.get_parent().stomp(self)
 
 
 func _play_random(audio_player: AudioStreamPlayer, sounds: Array[AudioStream]) -> void:

@@ -1,0 +1,22 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://flyer.gd" id="1_flyer"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/flyer_frames.tres" id="2_frames"]
+[ext_resource type="Script" path="res://outline.gd" id="3_outline"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_flyer"]
+size = Vector2(24, 17)
+
+[node name="Flyer" type="Area2D"]
+script = ExtResource("1_flyer")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = ExtResource("2_frames")
+autoplay = "default"
+
+[node name="Outline" type="Node2D" parent="AnimatedSprite2D"]
+script = ExtResource("3_outline")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(-2, -0.5)
+shape = SubResource("RectangleShape2D_flyer")

@@ -5,6 +5,7 @@ signal moon_passed
 signal coin_collected
 signal mushroom_collected
 signal obstacle_spawned
+signal hourglass_collected
 
 @export var default_mode: ModeSettings = preload("res://assets/modes/earth.tres")
 @export var obstacle_scene: PackedScene = preload("res://obstacle.tscn")
@@ -38,6 +39,19 @@ signal obstacle_spawned
 @export var pipe_pair_gap := 70.0
 @export var pipe_pair_center_range := Vector2(60.0, 195.0)
 @export var pipe_pair_max_shift := 60.0
+@export var player_x := 40.0
+@export var flyer_scene: PackedScene = preload("res://flyer.tscn")
+@export var flyer_low_y := 230.0
+@export var flyer_high_y := 204.0
+@export var flyer_width := 24.0
+@export var goomba_scene: PackedScene = preload("res://goomba.tscn")
+@export var goomba_chance := 1.0 / 3.0
+@export var goomba_width := 14.0
+@export var hourglass_scene: PackedScene = preload("res://hourglass.tscn")
+@export var hourglass_chance := 0.1
+@export var hourglass_margin := 8.0
+@export var hourglass_half_height := 10.0
+@export var hourglass_min_y := 30.0
 
 var speed := 0.0:
 	set(value):
@@ -50,6 +64,8 @@ var mode: ModeSettings
 var _distance_to_next := 0.0
 var _rolls_since_night := 0
 var _last_gap_center := 130.0
+var _spawned_total := 0
+var world_time_scale := 1.0
 
 
 func start() -> void:
@@ -77,6 +93,7 @@ func _physics_process(delta: float) -> void:
 	_distance_to_next -= speed * delta
 	if _distance_to_next <= 0.0:
 		var group_width := _spawn_group()
+		_spawned_total += 1
 		obstacle_spawned.emit()
 		var gap := randf_range(speed * mode.min_gap_seconds, speed * mode.max_gap_seconds)
 		_distance_to_next = maxf(gap, min_gap_pixels) + group_width
@@ -86,6 +103,9 @@ func _spawn_group() -> float:
 	if _rolls_since_night >= night_every:
 		_rolls_since_night = 0
 		return _spawn_night()
+
+	if mode.flyer_chance > 0.0 and _spawned_total >= mode.flyer_min_obstacles and randf() < mode.flyer_chance:
+		return _spawn_flyer()
 
 	match mode.obstacles:
 		ModeSettings.Obstacles.ASTEROIDS:
@@ -102,6 +122,16 @@ func _spawn_night() -> float:
 	var night := _spawn(night_scene, Vector2(spawn_x, y))
 	night.passed_over.connect(moon_passed.emit)
 	return night_width
+
+
+func _spawn_flyer() -> float:
+	var flyer := flyer_scene.instantiate()
+	var y := flyer_low_y if randf() < 0.5 else flyer_high_y
+	var x := spawn_x
+	if speed > 0.0:
+		x = player_x + (spawn_x - player_x) * (speed + flyer.extra_speed) / speed
+	_add_obstacle(flyer, Vector2(x, y))
+	return flyer_width
 
 
 func _spawn_cacti() -> float:
@@ -121,12 +151,24 @@ func _spawn_asteroids() -> float:
 	var count := randi_range(1, max_asteroid_group_size)
 	var bottom_y := _pick_band_bottom()
 	var x := spawn_x
+	var tallest := 0.0
 	for i in count:
 		var asteroid := _spawn(asteroid_scene, Vector2(x, 0.0))
 		var extent: Rect2 = asteroid.extent
 		asteroid.global_position = Vector2(x - extent.position.x, bottom_y - extent.end.y)
 		x += extent.size.x + asteroid_spacing
+		tallest = maxf(tallest, extent.size.y)
+	if randf() < hourglass_chance:
+		_spawn_hourglass((spawn_x + x) / 2.0, bottom_y - tallest, bottom_y)
 	return x - spawn_x
+
+
+func _spawn_hourglass(center_x: float, top_y: float, bottom_y: float) -> void:
+	var options: Array[float] = [maxf(top_y - hourglass_margin - hourglass_half_height, hourglass_min_y)]
+	var below := bottom_y + hourglass_margin + hourglass_half_height
+	if below + hourglass_half_height <= floor_y - 2.0:
+		options.append(below)
+	_spawn_pickup(hourglass_scene, Vector2(center_x, options.pick_random()), hourglass_collected)
 
 
 func _spawn_pipe() -> float:
@@ -146,6 +188,11 @@ func _spawn_pipe() -> float:
 		var first := arc_center - coin_arc_spacing * (coin_arc_heights.size() - 1) / 2.0
 		for i in coin_arc_heights.size():
 			_spawn_coin(Vector2(first + i * coin_arc_spacing, floor_y - coin_arc_heights[i]))
+	if randf() < goomba_chance:
+		var goomba := goomba_scene.instantiate()
+		var goomba_x: float = spawn_x + pipe.width + (speed + goomba.walk_speed) * mode.min_gap_seconds
+		_add_obstacle(goomba, Vector2(goomba_x, floor_y))
+		return goomba_x - spawn_x + goomba_width
 	return pipe.width
 
 

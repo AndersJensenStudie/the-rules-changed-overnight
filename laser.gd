@@ -31,7 +31,7 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
 	if speed > 0.0:
-		position.x -= laser_speed * delta
+		position.x -= laser_speed * get_parent().world_time_scale * delta
 	if global_position.x < -40.0:
 		queue_free()
 

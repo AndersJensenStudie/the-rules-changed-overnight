@@ -12,3 +12,5 @@ sprite_frames = ExtResource("2_frames")
 hitbox_rects = Array[Rect2]([Rect2(-11, -9, 22, 17), Rect2(-7, 8, 9, 7)])
 backdrop_frames = ExtResource("4_backdrop")
 music = ExtResource("3_music")
+flyer_chance = 0.25
+flyer_min_obstacles = 20

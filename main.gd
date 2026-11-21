@@ -8,6 +8,10 @@ const HIGH_SCORE_PATH := "user://highscore.save"
 @export var max_speed := 320.0
 @export var acceleration := 4.0
 @export var acceleration_delay := 5.0
+@export var slow_speed := 120.0
+@export var slow_duration := 5.0
+@export var slow_ramp_time := 0.4
+@export var slow_music_scale := 0.7
 @export var restart_delay := 0.4
 @export var backdrop_fade_time := 0.3
 @export var score_per_second := 1.0
@@ -40,6 +44,9 @@ var coin_sounds: Array[AudioStream] = []
 var _reset_hold := 0.0
 var speed := 0.0
 var _run_time := 0.0
+var _slow_time := 0.0
+var _recovering := false
+var _ramp_rate := 0.0
 var _over_time := 0.0
 var _backdrop_tween: Tween
 var _still_backdrops := {}
@@ -67,6 +74,8 @@ func _ready() -> void:
 		if stream:
 			coin_sounds.append(stream)
 	spawner.mushroom_collected.connect(_on_mushroom_collected)
+	spawner.hourglass_collected.connect(_on_hourglass_collected)
+	Music.set_speed_scale(1.0)
 	hp_label.add_theme_color_override("font_color", hp_color)
 	hp_label.add_theme_color_override("font_outline_color", hp_outline_color)
 	hp_label.add_theme_constant_override("outline_size", 2)
@@ -85,8 +94,7 @@ func _process(delta: float) -> void:
 				_start()
 		State.RUNNING:
 			_run_time += delta
-			if _run_time > acceleration_delay:
-				speed = minf(speed + acceleration * delta, max_speed)
+			_update_speed(delta)
 			spawner.speed = speed
 			ground.speed = speed
 			_add_score(score_per_second * delta)
@@ -94,6 +102,34 @@ func _process(delta: float) -> void:
 			_over_time += delta
 			if _over_time > restart_delay and Input.is_action_just_pressed("jump"):
 				get_tree().reload_current_scene()
+
+
+func _update_speed(delta: float) -> void:
+	if _slow_time > 0.0:
+		_slow_time -= delta
+		speed = move_toward(speed, slow_speed, _ramp_rate * delta)
+		if _slow_time <= 0.0:
+			_recovering = true
+			_ramp_rate = (start_speed - slow_speed) / slow_ramp_time
+	elif _recovering:
+		speed = move_toward(speed, start_speed, _ramp_rate * delta)
+		if is_equal_approx(speed, start_speed):
+			_recovering = false
+	elif _run_time > acceleration_delay:
+		speed = minf(speed + acceleration * delta, max_speed)
+	var slow_factor := slow_speed / start_speed
+	var factor := 1.0
+	if _slow_time > 0.0 or _recovering:
+		factor = clampf(speed / start_speed, slow_factor, 1.0)
+	spawner.world_time_scale = factor
+	Music.set_speed_scale(lerpf(slow_music_scale, 1.0, inverse_lerp(slow_factor, 1.0, factor)))
+
+
+func _on_hourglass_collected() -> void:
+	if _slow_time <= 0.0:
+		_ramp_rate = absf(speed - slow_speed) / slow_ramp_time
+	_slow_time = slow_duration
+	_recovering = false
 
 
 func _start() -> void:
@@ -266,6 +302,7 @@ func _game_over(obstacle: Node2D = null) -> void:
 	spawner.speed = 0.0
 	ground.speed = 0.0
 	player.die()
+	Music.set_speed_scale(1.0)
 	_save_high_score()
 	message_label.text = "GAME OVER\nPress SPAcE to restart"
 

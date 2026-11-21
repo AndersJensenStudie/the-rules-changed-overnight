@@ -23,3 +23,8 @@ func apply_mode(settings: ModeSettings) -> void:
 	elif ambient.stream != settings.ambient or not ambient.playing:
 		ambient.stream = settings.ambient
 		ambient.play()
+
+
+func set_speed_scale(scale: float) -> void:
+	pitch_scale = scale
+	ambient.pitch_scale = scale
