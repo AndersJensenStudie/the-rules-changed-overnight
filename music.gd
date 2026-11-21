@@ -14,6 +14,7 @@ func _ready() -> void:
 
 
 func apply_mode(settings: ModeSettings) -> void:
+	volume_db = settings.music_volume_db
 	if settings.music and settings.music != stream:
 		var position := get_playback_position()
 		stream = settings.music

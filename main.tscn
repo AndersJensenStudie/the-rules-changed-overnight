@@ -5,6 +5,8 @@
 [ext_resource type="PackedScene" uid="uid://baw5ubhq3kjlq" path="res://stage.tscn" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://br7frjenbuf6g" path="res://cactus_spawner.gd" id="3_spawn"]
 [ext_resource type="Script" uid="uid://cjfjgvvgrh30p" path="res://ground.gd" id="4_ground"]
+[ext_resource type="Script" path="res://bot.gd" id="7_bot"]
+[ext_resource type="Texture2D" path="res://assets/images/gear.png" id="8_gear"]
 
 [node name="main" type="Node2D" unique_id=1252278135]
 script = ExtResource("0_main")
@@ -29,7 +31,16 @@ script = ExtResource("3_spawn")
 [node name="Player" parent="." unique_id=667366106 instance=ExtResource("1_ig7tw")]
 position = Vector2(40, 200)
 
+[node name="Bot" type="Node" parent="."]
+script = ExtResource("7_bot")
+
 [node name="HUD" type="CanvasLayer" parent="." unique_id=522879554]
+
+[node name="Gear" type="Sprite2D" parent="HUD"]
+visible = false
+position = Vector2(12, 12)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("8_gear")
 
 [node name="MessageLabel" type="Label" parent="HUD" unique_id=1328029335]
 offset_top = 78.0

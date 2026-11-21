@@ -2,8 +2,8 @@
 
 [ext_resource type="Script" uid="uid://glp3yxydk23g" path="res://mode_settings.gd" id="1_script"]
 [ext_resource type="SpriteFrames" uid="uid://bs8vo7wbedyix" path="res://assets/animations/flappy_frames.tres" id="2_frames"]
-[ext_resource type="SpriteFrames" uid="uid://cr13dtlkqpp3u" path="res://assets/animations/dino_backdrop_frames.tres" id="3_backdrop"]
-[ext_resource type="AudioStream" uid="uid://cia1ud4lnwh43" path="res://assets/music/basic.wav" id="4_music"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/flappy_backdrop_frames.tres" id="3_backdrop"]
+[ext_resource type="AudioStream" path="res://assets/music/distorted.wav" id="4_music"]
 
 [resource]
 script = ExtResource("1_script")
@@ -22,3 +22,4 @@ max_rise_speed = 320.0
 floor_kills = true
 backdrop_frames = ExtResource("3_backdrop")
 music = ExtResource("4_music")
+music_volume_db = 3.0

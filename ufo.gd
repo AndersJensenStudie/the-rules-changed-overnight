@@ -14,6 +14,7 @@ extends Node2D
 var _time := 0.0
 var _obstacles_seen := 0
 var _attacking := false
+var _attack_elapsed := 0.0
 var _spawner: Node
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
@@ -28,6 +29,7 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	if _attacking:
+		_attack_elapsed += delta
 		return
 	_time += delta * _time_scale()
 	_update_position()
@@ -45,8 +47,13 @@ func _on_obstacle_spawned() -> void:
 		_attack()
 
 
+func time_until_fire() -> float:
+	return maxf(0.0, flashes * flash_time * 2.0 / _time_scale() - _attack_elapsed)
+
+
 func _attack() -> void:
 	_attacking = true
+	_attack_elapsed = 0.0
 	for i in flashes:
 		sprite.self_modulate = flash_color
 		await get_tree().create_timer(flash_time / _time_scale(), false).timeout

@@ -23,4 +23,5 @@ backdrop_frames = ExtResource("3_backdrop")
 decorations = Array[PackedScene]([ExtResource("6_ufo")])
 ground_color = Color(0.75, 0.75, 0.8, 1)
 music = ExtResource("4_music")
+music_volume_db = 2.0
 ambient = ExtResource("5_ambient")

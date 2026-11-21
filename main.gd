@@ -4,6 +4,8 @@ enum State { READY, RUNNING, REVIVING, OVER }
 
 const HIGH_SCORE_PATH := "user://highscore.save"
 
+static var bot_enabled := false
+
 @export var start_speed := 200.0
 @export var max_speed := 320.0
 @export var acceleration := 4.0
@@ -13,6 +15,10 @@ const HIGH_SCORE_PATH := "user://highscore.save"
 @export var slow_ramp_time := 0.4
 @export var slow_music_scale := 0.7
 @export var feather_time := 5.0
+@export var bot_hold_time := 1.0
+@export var bot_start_delay := 0.3
+@export var bot_restart_delay := 0.8
+@export var gear_spin_speed := 2.0
 @export var restart_delay := 0.4
 @export var backdrop_fade_time := 0.3
 @export var score_per_second := 1.0
@@ -45,6 +51,10 @@ var coin_sounds: Array[AudioStream] = []
 var _reset_hold := 0.0
 var speed := 0.0
 var _run_time := 0.0
+var _bot_hold := 0.0
+var _bot_hold_used := false
+var _bot_run := false
+var _ready_time := 0.0
 var _slow_time := 0.0
 var _recovering := false
 var _ramp_rate := 0.0
@@ -63,6 +73,7 @@ var _still_backdrops := {}
 @onready var score_label: Label = $HUD/ScoreLabel
 @onready var high_score_label: Label = $HUD/HighScoreLabel
 @onready var hp_label: Label = $HUD/HPLabel
+@onready var gear: Sprite2D = $HUD/Gear
 
 
 func _ready() -> void:
@@ -78,6 +89,8 @@ func _ready() -> void:
 	spawner.hourglass_collected.connect(_on_hourglass_collected)
 	spawner.feather_collected.connect(_on_feather_collected)
 	Music.set_speed_scale(1.0)
+	_bot_hold_used = Input.is_action_pressed("bot_mode")
+	gear.visible = bot_enabled
 	hp_label.add_theme_color_override("font_color", hp_color)
 	hp_label.add_theme_color_override("font_outline_color", hp_outline_color)
 	hp_label.add_theme_constant_override("outline_size", 2)
@@ -90,9 +103,12 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_check_high_score_reset(delta)
+	_check_bot_toggle(delta)
+	gear.rotation += gear_spin_speed * delta
 	match state:
 		State.READY:
-			if Input.is_action_just_pressed("jump"):
+			_ready_time += delta
+			if Input.is_action_just_pressed("jump") or (bot_enabled and _ready_time > bot_start_delay):
 				_start()
 		State.RUNNING:
 			_run_time += delta
@@ -102,7 +118,9 @@ func _process(delta: float) -> void:
 			_add_score(score_per_second * delta)
 		State.OVER:
 			_over_time += delta
-			if _over_time > restart_delay and Input.is_action_just_pressed("jump"):
+			if bot_enabled and _over_time > bot_restart_delay:
+				get_tree().reload_current_scene()
+			elif _over_time > restart_delay and Input.is_action_just_pressed("jump"):
 				get_tree().reload_current_scene()
 
 
@@ -138,7 +156,30 @@ func _on_hourglass_collected() -> void:
 	_recovering = false
 
 
+func _check_bot_toggle(delta: float) -> void:
+	if not Input.is_action_pressed("bot_mode"):
+		_bot_hold = 0.0
+		_bot_hold_used = false
+		return
+	if _bot_hold_used:
+		return
+	_bot_hold += delta
+	if _bot_hold < bot_hold_time:
+		return
+	_bot_hold_used = true
+	if bot_enabled:
+		bot_enabled = false
+		gear.visible = false
+		if state == State.RUNNING or state == State.REVIVING:
+			_game_over(null, true)
+	elif state == State.READY:
+		bot_enabled = true
+		gear.visible = true
+		_start()
+
+
 func _start() -> void:
+	_bot_run = bot_enabled
 	state = State.RUNNING
 	speed = start_speed
 	message_label.text = ""
@@ -169,7 +210,7 @@ func _on_mushroom_collected() -> void:
 
 func _add_score(amount: float) -> void:
 	score += amount
-	if int(score) > high_score:
+	if not _bot_run and int(score) > high_score:
 		high_score = int(score)
 	_update_score_labels()
 
@@ -229,6 +270,8 @@ func _load_high_score() -> int:
 
 
 func _save_high_score() -> void:
+	if _bot_run:
+		return
 	var file := FileAccess.open(HIGH_SCORE_PATH, FileAccess.WRITE)
 	if file:
 		file.store_32(high_score)
@@ -292,13 +335,15 @@ func _show_backdrop(frames: SpriteFrames, instant: bool) -> void:
 		_backdrop_tween.tween_callback(backdrop.hide)
 
 
-func _game_over(obstacle: Node2D = null) -> void:
-	if state != State.RUNNING or player.is_invincible():
+func _game_over(obstacle: Node2D = null, forced := false) -> void:
+	if state == State.REVIVING and forced:
+		state = State.RUNNING
+	if state != State.RUNNING or (player.is_invincible() and not forced):
 		return
 	if obstacle and obstacle.hit_sound:
 		hit_sound.stream = obstacle.hit_sound
 		hit_sound.play()
-	if lives > 0:
+	if lives > 0 and not forced:
 		_revive()
 		return
 	state = State.OVER

@@ -43,4 +43,5 @@ enum Obstacles { CACTI, ASTEROIDS, PIPES, PIPE_PAIRS }
 @export var label_color := Color(1, 1, 1)
 @export_group("Sound")
 @export var music: AudioStream
+@export var music_volume_db := 0.0
 @export var ambient: AudioStream
