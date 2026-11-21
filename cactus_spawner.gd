@@ -10,7 +10,7 @@ signal player_hit
 @export var min_gap_pixels := 90.0 
 @export var max_group_size := 3
 @export var night_scene: PackedScene = preload("res://night.tscn")
-@export var night_chance := 0.01
+@export var night_chance := 0.05
 @export var night_y := 200.0
 @export var night_min_speed := 200.0
 @export var night_width := 28.0
