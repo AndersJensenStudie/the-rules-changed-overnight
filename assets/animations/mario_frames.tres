@@ -1,7 +1,7 @@
-[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://hofvcm8iqjsg"]
 
 [ext_resource type="Texture2D" uid="uid://dfhhykpesysml" path="res://assets/images/bloodsplatter.png" id="1_blood"]
-[ext_resource type="Texture2D" path="res://assets/images/mario.png" id="2_mario"]
+[ext_resource type="Texture2D" uid="uid://b4tn4utydqab6" path="res://assets/images/mario.png" id="2_mario"]
 
 [sub_resource type="AtlasTexture" id="die_0"]
 atlas = ExtResource("1_blood")
@@ -116,7 +116,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("walk_7")
 }],
-"loop": true,
+"loop": 1,
 "name": &"walk",
 "speed": 10.0
 }]

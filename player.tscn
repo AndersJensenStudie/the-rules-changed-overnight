@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bqebtx6vlif5o" path="res://player.gd" id="1_onrkg"]
 [ext_resource type="SpriteFrames" uid="uid://bsh8phmyj7qe7" path="res://assets/animations/dino_frames.tres" id="2_frames"]
+[ext_resource type="Script" path="res://outline.gd" id="9_outline"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v0lsh"]
 size = Vector2(24, 26)
@@ -18,3 +19,6 @@ animation = &"walk"
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=947904048]
 position = Vector2(0, 2)
 shape = SubResource("RectangleShape2D_v0lsh")
+
+[node name="Outline" type="Node2D" parent="AnimatedSprite2D"]
+script = ExtResource("9_outline")

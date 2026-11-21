@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" path="res://obstacle.gd" id="1_obst"]
 [ext_resource type="Texture2D" uid="uid://f3lbq56d62kt" path="res://assets/images/cactus.png" id="1_sl1jc"]
+[ext_resource type="Script" path="res://outline.gd" id="9_outline"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_v0lsh"]
 size = Vector2(10, 24)
@@ -15,3 +16,6 @@ shape = SubResource("RectangleShape2D_v0lsh")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1618545018]
 texture = ExtResource("1_sl1jc")
+
+[node name="Outline" type="Node2D" parent="Sprite2D"]
+script = ExtResource("9_outline")

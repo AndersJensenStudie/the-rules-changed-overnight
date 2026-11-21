@@ -20,6 +20,7 @@ enum Obstacles { CACTI, ASTEROIDS, PIPES }
 @export var max_gap_seconds := 1.8
 @export_group("Look")
 @export var backdrop: Texture2D
+@export var backdrop_frames: SpriteFrames
 @export var ground_color := Color(0.33, 0.33, 0.33)
 @export var label_color := Color(0.33, 0.33, 0.33)
 @export_group("Sound")

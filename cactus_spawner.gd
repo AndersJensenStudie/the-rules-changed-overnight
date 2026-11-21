@@ -14,7 +14,6 @@ signal mushroom_collected
 @export var night_scene: PackedScene = preload("res://night.tscn")
 @export var night_every := 10
 @export var night_y := 200.0
-@export var night_min_speed := 200.0
 @export var night_width := 28.0
 @export var asteroid_scene: PackedScene = preload("res://asteroid.tscn")
 @export var max_asteroid_group_size := 2
@@ -76,11 +75,10 @@ func _physics_process(delta: float) -> void:
 		_distance_to_next = maxf(gap, min_gap_pixels) + group_width
 
 func _spawn_group() -> float:
-	if speed >= night_min_speed:
-		_rolls_since_night += 1
-		if _rolls_since_night >= night_every:
-			_rolls_since_night = 0
-			return _spawn_night()
+	_rolls_since_night += 1
+	if _rolls_since_night >= night_every:
+		_rolls_since_night = 0
+		return _spawn_night()
 
 	match mode.obstacles:
 		ModeSettings.Obstacles.ASTEROIDS:

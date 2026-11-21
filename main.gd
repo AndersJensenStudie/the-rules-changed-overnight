@@ -4,13 +4,15 @@ enum State { READY, RUNNING, REVIVING, OVER }
 
 const HIGH_SCORE_PATH := "user://highscore.save"
 
-@export var start_speed := 120.0
+@export var start_speed := 200.0
 @export var max_speed := 320.0
 @export var acceleration := 4.0
+@export var acceleration_delay := 5.0
 @export var restart_delay := 0.4
 @export var backdrop_fade_time := 0.3
 @export var score_per_second := 1.0
 @export var coin_score := 10
+@export_dir var coin_sounds_dir := "res://assets/sounds/coins"
 @export var popup_color := Color(1.0, 0.8, 0.1)
 @export var popup_outline_color := Color(0.35, 0.22, 0.0)
 @export var popup_time := 0.8
@@ -33,16 +35,19 @@ var coins := 0
 var score := 0.0
 var high_score := 0
 var lives := 0
+var coin_sounds: Array[AudioStream] = []
 var _reset_hold := 0.0
 var speed := 0.0
+var _run_time := 0.0
 var _over_time := 0.0
 var _backdrop_tween: Tween
+var _still_backdrops := {}
 
 @onready var player: CharacterBody2D = $Player
 @onready var spawner: Node2D = $CactusSpawner
 @onready var ground: Node2D = $Ground
 @onready var message_label: Label = $HUD/MessageLabel
-@onready var backdrop: Sprite2D = $Backdrop
+@onready var backdrop: AnimatedSprite2D = $Backdrop
 @onready var coin_sound: AudioStreamPlayer = $CoinSound
 @onready var hit_sound: AudioStreamPlayer = $HitSound
 @onready var score_label: Label = $HUD/ScoreLabel
@@ -54,6 +59,10 @@ func _ready() -> void:
 	spawner.player_hit.connect(_game_over)
 	spawner.moon_passed.connect(_on_moon_passed)
 	spawner.coin_collected.connect(_on_coin_collected)
+	for file in ResourceLoader.list_directory(coin_sounds_dir):
+		var stream := load(coin_sounds_dir.path_join(file)) as AudioStream
+		if stream:
+			coin_sounds.append(stream)
 	spawner.mushroom_collected.connect(_on_mushroom_collected)
 	hp_label.add_theme_color_override("font_color", hp_color)
 	hp_label.add_theme_color_override("font_outline_color", hp_outline_color)
@@ -72,7 +81,9 @@ func _process(delta: float) -> void:
 			if Input.is_action_just_pressed("jump"):
 				_start()
 		State.RUNNING:
-			speed = minf(speed + acceleration * delta, max_speed)
+			_run_time += delta
+			if _run_time > acceleration_delay:
+				speed = minf(speed + acceleration * delta, max_speed)
 			spawner.speed = speed
 			ground.speed = speed
 			_add_score(score_per_second * delta)
@@ -99,7 +110,9 @@ func _on_moon_passed() -> void:
 
 func _on_coin_collected() -> void:
 	coins += 1
-	coin_sound.play()
+	if not coin_sounds.is_empty():
+		coin_sound.stream = coin_sounds.pick_random()
+		coin_sound.play()
 	_add_score(coin_score)
 	_show_popup("+%d" % coin_score)
 
@@ -185,23 +198,36 @@ func _set_mode(index: int, instant := false) -> void:
 	ground.apply_mode(settings)
 	for label in [message_label, score_label, high_score_label]:
 		label.add_theme_color_override("font_color", settings.label_color)
-	_show_backdrop(settings.backdrop, instant)
+	_show_backdrop(_backdrop_frames_for(settings), instant)
 	Music.apply_mode(settings)
 
 
-func _show_backdrop(texture: Texture2D, instant: bool) -> void:
+func _backdrop_frames_for(settings: ModeSettings) -> SpriteFrames:
+	if settings.backdrop_frames:
+		return settings.backdrop_frames
+	if settings.backdrop == null:
+		return null
+	if not _still_backdrops.has(settings.backdrop):
+		var frames := SpriteFrames.new()
+		frames.add_frame(&"default", settings.backdrop)
+		_still_backdrops[settings.backdrop] = frames
+	return _still_backdrops[settings.backdrop]
+
+
+func _show_backdrop(frames: SpriteFrames, instant: bool) -> void:
 	if _backdrop_tween:
 		_backdrop_tween.kill()
+	if frames and frames != backdrop.sprite_frames:
+		backdrop.sprite_frames = frames
+		backdrop.play(&"default")
 	if instant:
-		backdrop.texture = texture
-		backdrop.visible = texture != null
+		backdrop.visible = frames != null
 		backdrop.modulate.a = 1.0
 		return
 	_backdrop_tween = create_tween()
-	if texture:
+	if frames:
 		if not backdrop.visible:
 			backdrop.modulate.a = 0.0
-		backdrop.texture = texture
 		backdrop.visible = true
 		_backdrop_tween.tween_property(backdrop, "modulate:a", 1.0, backdrop_fade_time)
 	elif backdrop.visible:

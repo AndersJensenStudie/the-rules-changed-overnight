@@ -5,15 +5,12 @@
 [ext_resource type="PackedScene" uid="uid://baw5ubhq3kjlq" path="res://stage.tscn" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://br7frjenbuf6g" path="res://cactus_spawner.gd" id="3_spawn"]
 [ext_resource type="Script" uid="uid://cjfjgvvgrh30p" path="res://ground.gd" id="4_ground"]
-[ext_resource type="Texture2D" uid="uid://837d3qjrl6lx" path="res://assets/images/backdrops/bg-space.png" id="5_backdrop"]
-[ext_resource type="AudioStream" path="res://assets/sounds/coin/coin.wav" id="6_coin_sound"]
 
 [node name="main" type="Node2D" unique_id=1252278135]
 script = ExtResource("0_main")
 
-[node name="Backdrop" type="Sprite2D" parent="." unique_id=1264066842]
+[node name="Backdrop" type="AnimatedSprite2D" parent="." unique_id=1264066842]
 visible = false
-texture = ExtResource("5_backdrop")
 centered = false
 
 [node name="Stage" parent="." unique_id=752080561 instance=ExtResource("2_0xm2m")]
@@ -41,7 +38,7 @@ theme_override_font_sizes/font_size = 10
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="HighScoreLabel" type="Label" parent="HUD"]
+[node name="HighScoreLabel" type="Label" parent="HUD" unique_id=928235352]
 offset_left = 140.0
 offset_top = 2.0
 offset_right = 244.0
@@ -50,7 +47,7 @@ theme_override_colors/font_color = Color(0.33, 0.33, 0.33, 1)
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 2
 
-[node name="HPLabel" type="Label" parent="HUD"]
+[node name="HPLabel" type="Label" parent="HUD" unique_id=478150940]
 offset_left = 60.0
 offset_top = 2.0
 offset_right = 130.0
@@ -58,7 +55,7 @@ offset_bottom = 15.0
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 2
 
-[node name="ScoreLabel" type="Label" parent="HUD"]
+[node name="ScoreLabel" type="Label" parent="HUD" unique_id=859137020]
 offset_left = 140.0
 offset_top = 14.0
 offset_right = 244.0
@@ -67,9 +64,8 @@ theme_override_colors/font_color = Color(0.33, 0.33, 0.33, 1)
 theme_override_font_sizes/font_size = 10
 horizontal_alignment = 2
 
-[node name="CoinSound" type="AudioStreamPlayer" parent="."]
-stream = ExtResource("6_coin_sound")
+[node name="CoinSound" type="AudioStreamPlayer" parent="." unique_id=404306216]
 bus = &"SFX"
 
-[node name="HitSound" type="AudioStreamPlayer" parent="."]
+[node name="HitSound" type="AudioStreamPlayer" parent="." unique_id=1130452946]
 bus = &"SFX"
