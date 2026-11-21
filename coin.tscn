@@ -1,0 +1,18 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://coin.gd" id="1_coin"]
+[ext_resource type="Texture2D" path="res://assets/images/coin.png" id="2_coin"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_coin"]
+size = Vector2(12, 8)
+
+[node name="Coin" type="Area2D"]
+script = ExtResource("1_coin")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_coin")
+offset = Vector2(-1, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_coin")

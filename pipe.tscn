@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://pipe.gd" id="1_pipe"]
+[ext_resource type="AudioStream" path="res://assets/sounds/pipe_hit.wav" id="2_hit"]
+
+[node name="Pipe" type="Area2D"]
+script = ExtResource("1_pipe")
+hit_sound = ExtResource("2_hit")

@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://dy8alkvofjx2u"]
 
 [ext_resource type="Texture2D" uid="uid://dfhhykpesysml" path="res://assets/images/bloodsplatter.png" id="1_blood"]
 [ext_resource type="Texture2D" uid="uid://bxmk3mq5xodva" path="res://assets/images/Spaceman.png" id="2_spaceman"]
@@ -144,7 +144,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("walk_11")
 }],
-"loop": true,
+"loop": 1,
 "name": &"walk",
-"speed": 8.0
+"speed": 20.0
 }]

@@ -1,23 +1,17 @@
 extends CharacterBody2D
 
+signal revived
+
 @export var speed := 300.0
 
-@export var jump_height := 84.0
-@export var time_to_peak := 0.25
-@export var time_to_fall := 0.26
+@export var default_mode: ModeSettings = preload("res://assets/modes/earth.tres")
+@export var feet_y := 15.0
 @export var jump_cut := 0.5 
 @export var coyote_time := 0.1  
 @export var jump_buffer_time := 0.1
 @export var jump_volume_db := 12.0
-@export_dir var jump_sounds_dir := "res://assets/sounds/jump_sounds"
 @export var death_volume_db := 8.0
-@export_dir var death_sounds_dir := "res://assets/sounds/death"
-@export var moon_jump_height := 135.0
-@export var moon_time_to_peak := 0.6
-@export var moon_time_to_fall := 0.65
-@export var moon_frames: SpriteFrames = preload("res://assets/animations/spaceman_frames.tres")
-@export var moon_sprite_position := Vector2(0, 2)
-@export var moon_hitbox_size := Vector2(10, 26)
+@export var blink_interval := 0.1
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: CollisionShape2D = $CollisionShape2D
@@ -32,25 +26,21 @@ var jump_sounds: Array[AudioStream] = []
 var jump_player := AudioStreamPlayer.new()
 var death_sounds: Array[AudioStream] = []
 var death_player := AudioStreamPlayer.new()
-var moon := false
-var _earth_frames: SpriteFrames
-var _earth_sprite_position: Vector2
-var _earth_hitbox_size: Vector2
+var mode: ModeSettings
+var _home_x := 0.0
+var _sound_cache := {}
+var _invincible_time := 0.0
 
 
 func _ready() -> void:
 	add_to_group("player")
 	$AnimatedSprite2D.play()
 	screen_size = get_viewport_rect().size
-	jump_sounds = _load_sounds(jump_sounds_dir)
-	death_sounds = _load_sounds(death_sounds_dir)
+	_home_x = position.x
 	_setup_player(jump_player, jump_volume_db)
 	_setup_player(death_player, death_volume_db)
 	hitbox.shape = hitbox.shape.duplicate()
-	_earth_frames = sprite.sprite_frames
-	_earth_sprite_position = sprite.position
-	_earth_hitbox_size = hitbox.shape.size
-	_recalc_jump(jump_height, time_to_peak, time_to_fall)
+	apply_mode(default_mode)
 
 
 func _recalc_jump(height: float, to_peak: float, to_fall: float) -> void:
@@ -59,25 +49,22 @@ func _recalc_jump(height: float, to_peak: float, to_fall: float) -> void:
 	fall_gravity = 2.0 * height / (to_fall * to_fall)
 
 
-func set_moon(on: bool) -> void:
-	if on == moon:
+func apply_mode(settings: ModeSettings) -> void:
+	if settings == mode:
 		return
-	moon = on
+	mode = settings
+	_recalc_jump(settings.jump_height, settings.time_to_peak, settings.time_to_fall)
 	var animation := sprite.animation
 	var playing := sprite.is_playing()
-	if on:
-		_recalc_jump(moon_jump_height, moon_time_to_peak, moon_time_to_fall)
-		sprite.sprite_frames = moon_frames
-		sprite.position = moon_sprite_position
-		hitbox.shape.size = moon_hitbox_size
-	else:
-		_recalc_jump(jump_height, time_to_peak, time_to_fall)
-		sprite.sprite_frames = _earth_frames
-		sprite.position = _earth_sprite_position
-		hitbox.shape.size = _earth_hitbox_size
+	sprite.sprite_frames = settings.sprite_frames
+	sprite.position = settings.sprite_position
 	sprite.animation = animation
 	if playing:
 		sprite.play()
+	hitbox.shape.size = settings.hitbox_size
+	hitbox.position.y = feet_y - settings.hitbox_size.y / 2.0
+	jump_sounds = _sounds_in(settings.jump_sounds_dir)
+	death_sounds = _sounds_in(settings.death_sounds_dir)
 
 
 func hitbox_rect() -> Rect2:
@@ -85,12 +72,15 @@ func hitbox_rect() -> Rect2:
 	return Rect2(hitbox.global_position - size / 2.0, size)
 
 
-func _load_sounds(dir: String) -> Array[AudioStream]:
+func _sounds_in(dir: String) -> Array[AudioStream]:
+	if _sound_cache.has(dir):
+		return _sound_cache[dir]
 	var sounds: Array[AudioStream] = []
 	for file in ResourceLoader.list_directory(dir):
 		var stream := load(dir.path_join(file)) as AudioStream
 		if stream:
 			sounds.append(stream)
+	_sound_cache[dir] = sounds
 	return sounds
 
 
@@ -108,6 +98,34 @@ func idle() -> void:
 
 func run() -> void:
 	$AnimatedSprite2D.play("walk")
+
+
+func revive() -> void:
+	velocity = Vector2.ZERO
+	set_physics_process(false)
+	sprite.play_backwards("die")
+	await sprite.animation_finished
+	set_physics_process(true)
+	sprite.play("walk")
+	revived.emit()
+
+
+func start_invincibility(duration: float) -> void:
+	_invincible_time = duration
+
+
+func is_invincible() -> bool:
+	return _invincible_time > 0.0
+
+
+func _process(delta: float) -> void:
+	if _invincible_time <= 0.0:
+		return
+	_invincible_time -= delta
+	if _invincible_time <= 0.0:
+		sprite.visible = true
+	else:
+		sprite.visible = fmod(_invincible_time, blink_interval * 2.0) > blink_interval
 
 
 func die() -> void:
@@ -142,6 +160,7 @@ func _physics_process(delta: float) -> void:
 		velocity.y *= jump_cut
 
 	move_and_slide()
+	position.x = _home_x
 
 
 func _play_random(audio_player: AudioStreamPlayer, sounds: Array[AudioStream]) -> void:

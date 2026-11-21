@@ -1,0 +1,19 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://coin.gd" id="1_pickup"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/life_mushroom_frames.tres" id="2_frames"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mushroom"]
+size = Vector2(10, 10)
+
+[node name="Mushroom" type="Area2D"]
+script = ExtResource("1_pickup")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+scale = Vector2(0.5, 0.5)
+sprite_frames = ExtResource("2_frames")
+autoplay = "default"
+offset = Vector2(0, 0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_mushroom")

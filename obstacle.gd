@@ -1,6 +1,8 @@
 extends Area2D
 
-signal hit
+signal hit(obstacle: Node2D)
+
+@export var hit_sound: AudioStream
 
 var speed := 0.0
 
@@ -17,4 +19,4 @@ func _physics_process(delta: float) -> void:
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
-		hit.emit()
+		hit.emit(self)

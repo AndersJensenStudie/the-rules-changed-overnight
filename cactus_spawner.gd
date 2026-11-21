@@ -1,24 +1,23 @@
 extends Node2D
 
-signal player_hit
+signal player_hit(obstacle: Node2D)
 signal moon_passed
+signal coin_collected
+signal mushroom_collected
 
+@export var default_mode: ModeSettings = preload("res://assets/modes/earth.tres")
 @export var obstacle_scene: PackedScene = preload("res://obstacle.tscn")
 @export var spawn_x := 280.0 
 @export var cactus_width := 14.0  
-@export var min_gap_seconds := 0.8 
-@export var max_gap_seconds := 1.8 
 @export var min_gap_pixels := 90.0 
 @export var max_group_size := 3
 @export var night_scene: PackedScene = preload("res://night.tscn")
-@export var night_chance := 0.2
+@export var night_every := 10
 @export var night_y := 200.0
 @export var night_min_speed := 200.0
 @export var night_width := 28.0
 @export var asteroid_scene: PackedScene = preload("res://asteroid.tscn")
-@export var moon_min_gap_seconds := 1.4
-@export var moon_max_gap_seconds := 2.4
-@export var moon_max_group_size := 2
+@export var max_asteroid_group_size := 2
 @export var asteroid_spacing := 2.0
 @export var floor_y := 242.0
 @export var low_air_bottom_y := 214.0
@@ -26,6 +25,16 @@ signal moon_passed
 @export var ground_band_weight := 0.5
 @export var low_air_band_weight := 0.3
 @export var high_air_band_weight := 0.2
+@export var pipe_scene: PackedScene = preload("res://pipe.tscn")
+@export var coin_scene: PackedScene = preload("res://coin.tscn")
+@export var mushroom_scene: PackedScene = preload("res://mushroom.tscn")
+@export var mushroom_chance := 0.05
+@export var pipe_height_range := Vector2(30.0, 60.0)
+@export var coin_above_pipe_chance := 0.5
+@export var coin_arc_chance := 0.4
+@export var coin_above_pipe_offset := 14.0
+@export var coin_arc_heights: Array[float] = [34.0, 50.0, 34.0]
+@export var coin_arc_spacing := 18.0
 
 var speed := 0.0:
 	set(value):
@@ -34,8 +43,9 @@ var speed := 0.0:
 			cactus.speed = value
 
 var running := false
-var moon := false
+var mode: ModeSettings
 var _distance_to_next := 0.0
+var _rolls_since_night := 0
 
 
 func start() -> void:
@@ -47,8 +57,13 @@ func stop() -> void:
 	running = false
 
 
-func set_moon(on: bool) -> void:
-	moon = on
+func apply_mode(settings: ModeSettings) -> void:
+	mode = settings
+
+
+func _ready() -> void:
+	if mode == null:
+		apply_mode(default_mode)
 
 
 func _physics_process(delta: float) -> void:
@@ -57,19 +72,31 @@ func _physics_process(delta: float) -> void:
 	_distance_to_next -= speed * delta
 	if _distance_to_next <= 0.0:
 		var group_width := _spawn_group()
-		var gap_range := Vector2(moon_min_gap_seconds, moon_max_gap_seconds) if moon else Vector2(min_gap_seconds, max_gap_seconds)
-		var gap := randf_range(speed * gap_range.x, speed * gap_range.y)
+		var gap := randf_range(speed * mode.min_gap_seconds, speed * mode.max_gap_seconds)
 		_distance_to_next = maxf(gap, min_gap_pixels) + group_width
 
 func _spawn_group() -> float:
-	if speed >= night_min_speed and randf() < night_chance:
-		var night := _spawn(night_scene, Vector2(spawn_x, night_y))
-		night.passed_over.connect(moon_passed.emit)
-		return night_width
+	if speed >= night_min_speed:
+		_rolls_since_night += 1
+		if _rolls_since_night >= night_every:
+			_rolls_since_night = 0
+			return _spawn_night()
 
-	if moon:
-		return _spawn_asteroids()
+	match mode.obstacles:
+		ModeSettings.Obstacles.ASTEROIDS:
+			return _spawn_asteroids()
+		ModeSettings.Obstacles.PIPES:
+			return _spawn_pipe()
+	return _spawn_cacti()
 
+
+func _spawn_night() -> float:
+	var night := _spawn(night_scene, Vector2(spawn_x, night_y))
+	night.passed_over.connect(moon_passed.emit)
+	return night_width
+
+
+func _spawn_cacti() -> float:
 	var allowed := 1
 	if speed > 160.0:
 		allowed = 2
@@ -83,7 +110,7 @@ func _spawn_group() -> float:
 
 
 func _spawn_asteroids() -> float:
-	var count := randi_range(1, moon_max_group_size)
+	var count := randi_range(1, max_asteroid_group_size)
 	var bottom_y := _pick_band_bottom()
 	var x := spawn_x
 	for i in count:
@@ -92,6 +119,40 @@ func _spawn_asteroids() -> float:
 		asteroid.global_position = Vector2(x - extent.position.x, bottom_y - extent.end.y)
 		x += extent.size.x + asteroid_spacing
 	return x - spawn_x
+
+
+func _spawn_pipe() -> float:
+	var pipe := pipe_scene.instantiate()
+	pipe.height = randf_range(pipe_height_range.x, pipe_height_range.y)
+	var center_x: float = spawn_x + pipe.width / 2.0
+	_add_obstacle(pipe, Vector2(center_x, floor_y))
+	var roll := randf()
+	if roll < coin_above_pipe_chance:
+		var above := Vector2(center_x, floor_y - pipe.height - coin_above_pipe_offset)
+		if randf() < mushroom_chance:
+			_spawn_pickup(mushroom_scene, above, mushroom_collected)
+		else:
+			_spawn_coin(above)
+	elif roll < coin_above_pipe_chance + coin_arc_chance:
+		var arc_center: float = spawn_x + pipe.width + speed * mode.min_gap_seconds / 2.0
+		var first := arc_center - coin_arc_spacing * (coin_arc_heights.size() - 1) / 2.0
+		for i in coin_arc_heights.size():
+			_spawn_coin(Vector2(first + i * coin_arc_spacing, floor_y - coin_arc_heights[i]))
+	return pipe.width
+
+
+func _spawn_coin(pos: Vector2) -> void:
+	_spawn_pickup(coin_scene, pos, coin_collected)
+
+
+func _spawn_pickup(scene: PackedScene, pos: Vector2, on_collected: Signal) -> void:
+	var pickup := scene.instantiate()
+	pickup.collected.connect(on_collected.emit)
+	_add_obstacle(pickup, pos)
+
+
+func resume() -> void:
+	running = true
 
 
 func _pick_band_bottom() -> float:
@@ -105,7 +166,10 @@ func _pick_band_bottom() -> float:
 
 
 func _spawn(scene: PackedScene, pos: Vector2) -> Node2D:
-	var obstacle := scene.instantiate()
+	return _add_obstacle(scene.instantiate(), pos)
+
+
+func _add_obstacle(obstacle: Node2D, pos: Vector2) -> Node2D:
 	obstacle.speed = speed
 	add_child(obstacle)
 	obstacle.global_position = pos

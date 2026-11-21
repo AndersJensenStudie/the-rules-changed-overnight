@@ -28,11 +28,11 @@ Jumping **over** a moon switches the run into *moon mode*. In moon mode, gravity
 
 ```
 night.tscn (PassZone) --passed_over--> CactusSpawner --moon_passed--> main.enter_moon_mode()
-                                                                        ├─ player.set_moon(true)
-                                                                        ├─ spawner.set_moon(true)
-                                                                        ├─ ground.set_moon(true)
-                                                                        ├─ Backdrop fade-in
-                                                                        └─ Music.set_moon(true)
+																		├─ player.set_moon(true)
+																		├─ spawner.set_moon(true)
+																		├─ ground.set_moon(true)
+																		├─ Backdrop fade-in
+																		└─ Music.set_moon(true)
 main._ready() (every restart) ──> Music.set_moon(false)
 ```
 

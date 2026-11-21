@@ -1,32 +1,25 @@
 extends AudioStreamPlayer
 
-const EARTH_MUSIC := preload("res://assets/music/basic.wav")
-const MOON_MUSIC := preload("res://assets/music/chorus.wav")
-const AMBIENT := preload("res://assets/sounds/ambient/ambient.wav")
-
 @export var ambient_volume_db := 10.0
 
-var moon := false
 var ambient := AudioStreamPlayer.new()
 
 
 func _ready() -> void:
-	stream = EARTH_MUSIC
+	stream = preload("res://assets/music/basic.wav")
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	ambient.stream = AMBIENT
 	ambient.volume_db = ambient_volume_db
 	add_child(ambient)
 	play()
 
 
-func set_moon(on: bool) -> void:
-	if on == moon:
-		return
-	moon = on
-	var position := get_playback_position()
-	stream = MOON_MUSIC if on else EARTH_MUSIC
-	play(position)
-	if on:
-		ambient.play()
-	else:
+func apply_mode(settings: ModeSettings) -> void:
+	if settings.music and settings.music != stream:
+		var position := get_playback_position()
+		stream = settings.music
+		play(fmod(position, stream.get_length()))
+	if settings.ambient == null:
 		ambient.stop()
+	elif ambient.stream != settings.ambient or not ambient.playing:
+		ambient.stream = settings.ambient
+		ambient.play()
