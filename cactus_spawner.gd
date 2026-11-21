@@ -29,7 +29,7 @@ signal feather_collected
 @export var pipe_scene: PackedScene = preload("res://pipe.tscn")
 @export var coin_scene: PackedScene = preload("res://coin.tscn")
 @export var mushroom_scene: PackedScene = preload("res://mushroom.tscn")
-@export var mushroom_chance := 0.5
+@export var mushroom_chance := 1.0 / 3.0
 @export var pipe_height_range := Vector2(30.0, 60.0)
 @export var coin_above_pipe_chance := 0.5
 @export var coin_arc_chance := 0.4

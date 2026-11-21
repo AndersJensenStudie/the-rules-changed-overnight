@@ -2,7 +2,6 @@ extends SceneTree
 
 const SHEET := "res://assets/fonts/Font-grayscale.png"
 const OUTPUT := "res://assets/fonts/pixel_font.tres"
-const FALLBACK := "res://assets/fonts/Super Arcade.ttf"
 const CHARACTERS := "PresSACEtoaHI0123456789+cGMOVRT"
 const CELL := 32
 const COLUMNS := 6
@@ -38,7 +37,6 @@ func _initialize() -> void:
 		font.set_glyph_uv_rect(0, size, glyph, Rect2(rect))
 		font.set_glyph_texture_idx(0, size, glyph, 0)
 	font.set_glyph_advance(0, tallest, 32, Vector2(SPACE_ADVANCE, 0))
-	font.fallbacks = [load(FALLBACK)]
 	var error := ResourceSaver.save(font, OUTPUT)
 	print("saved %s with %d characters, height %d px: %s" % [OUTPUT, used_rects.size(), tallest, error_string(error)])
 	quit()
