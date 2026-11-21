@@ -1,7 +1,7 @@
 extends Node2D
 
 @export var x := 222.0
-@export var top_y := 24.0
+@export var top_y := 133.0
 @export var bottom_y := 230.0
 @export var period := 4.0
 @export var obstacles_per_attack := 3
