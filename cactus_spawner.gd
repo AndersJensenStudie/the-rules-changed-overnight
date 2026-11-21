@@ -4,6 +4,7 @@ signal player_hit(obstacle: Node2D)
 signal moon_passed
 signal coin_collected
 signal mushroom_collected
+signal obstacle_spawned
 
 @export var default_mode: ModeSettings = preload("res://assets/modes/earth.tres")
 @export var obstacle_scene: PackedScene = preload("res://obstacle.tscn")
@@ -26,7 +27,7 @@ signal mushroom_collected
 @export var pipe_scene: PackedScene = preload("res://pipe.tscn")
 @export var coin_scene: PackedScene = preload("res://coin.tscn")
 @export var mushroom_scene: PackedScene = preload("res://mushroom.tscn")
-@export var mushroom_chance := 0.05
+@export var mushroom_chance := 0.5
 @export var pipe_height_range := Vector2(30.0, 60.0)
 @export var coin_above_pipe_chance := 0.5
 @export var coin_arc_chance := 0.4
@@ -65,6 +66,7 @@ func apply_mode(settings: ModeSettings) -> void:
 
 
 func _ready() -> void:
+	add_to_group("spawner")
 	if mode == null:
 		apply_mode(default_mode)
 
@@ -75,6 +77,7 @@ func _physics_process(delta: float) -> void:
 	_distance_to_next -= speed * delta
 	if _distance_to_next <= 0.0:
 		var group_width := _spawn_group()
+		obstacle_spawned.emit()
 		var gap := randf_range(speed * mode.min_gap_seconds, speed * mode.max_gap_seconds)
 		_distance_to_next = maxf(gap, min_gap_pixels) + group_width
 
@@ -207,6 +210,10 @@ func _add_obstacle(obstacle: Node2D, pos: Vector2) -> Node2D:
 	obstacle.global_position = pos
 	obstacle.hit.connect(player_hit.emit)
 	return obstacle
+
+
+func add_projectile(projectile: Node2D, pos: Vector2) -> void:
+	_add_obstacle(projectile, pos)
 
 
 func clear() -> void:

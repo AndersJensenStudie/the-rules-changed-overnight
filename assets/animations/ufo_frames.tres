@@ -1,4 +1,4 @@
-[gd_resource type="SpriteFrames" format=3]
+[gd_resource type="SpriteFrames" format=3 uid="uid://2svsd1ur3jnk"]
 
 [ext_resource type="Texture2D" uid="uid://blcs5c6kriilw" path="res://assets/images/ufo.png" id="1_ufo"]
 
@@ -40,7 +40,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("frame_4")
 }],
-"loop": true,
+"loop": 1,
 "name": &"default",
 "speed": 8.0
 }]
