@@ -13,6 +13,7 @@ enum Obstacles { CACTI, ASTEROIDS, PIPES, PIPE_PAIRS }
 @export var sprite_position := Vector2(4, -1)
 @export var run_animation := &"walk"
 @export var hitbox_size := Vector2(24, 26)
+@export var hitbox_rects: Array[Rect2] = []
 @export_dir var jump_sounds_dir := "res://assets/sounds/jump_sounds"
 @export_dir var death_sounds_dir := "res://assets/sounds/death"
 @export_group("Obstacles")
@@ -23,6 +24,8 @@ enum Obstacles { CACTI, ASTEROIDS, PIPES, PIPE_PAIRS }
 @export_group("Flight")
 @export var flight := false
 @export var flap_velocity := 190.0
+@export var flap_stack_boost := 0.0
+@export var max_rise_speed := 190.0
 @export var flight_gravity := 700.0
 @export var max_fall_speed := 300.0
 @export var floor_kills := false

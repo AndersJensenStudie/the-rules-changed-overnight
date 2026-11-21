@@ -32,6 +32,7 @@ var _home_x := 0.0
 var _sound_cache := {}
 var _invincible_time := 0.0
 var _hover_time := 0.0
+var _extra_hitboxes: Array[CollisionShape2D] = []
 
 
 func _ready() -> void:
@@ -68,15 +69,43 @@ func apply_mode(settings: ModeSettings) -> void:
 	if settings.flight:
 		velocity.y = 0.0
 		_hover_time = settings.entry_hover_time
-	hitbox.shape.size = settings.hitbox_size
-	hitbox.position.y = feet_y - settings.hitbox_size.y / 2.0
+	_apply_hitboxes(settings)
 	jump_sounds = _sounds_in(settings.jump_sounds_dir)
 	death_sounds = _sounds_in(settings.death_sounds_dir)
 
 
+func _apply_hitboxes(settings: ModeSettings) -> void:
+	var rects := settings.hitbox_rects.duplicate()
+	if rects.is_empty():
+		rects.append(Rect2(Vector2(-settings.hitbox_size.x / 2.0, feet_y - settings.hitbox_size.y), settings.hitbox_size))
+	for extra in _extra_hitboxes:
+		extra.queue_free()
+	_extra_hitboxes.clear()
+	_place_hitbox(hitbox, rects[0])
+	for i in range(1, rects.size()):
+		var extra := CollisionShape2D.new()
+		extra.shape = RectangleShape2D.new()
+		_place_hitbox(extra, rects[i])
+		add_child(extra)
+		_extra_hitboxes.append(extra)
+
+
+func _place_hitbox(shape: CollisionShape2D, rect: Rect2) -> void:
+	shape.shape.size = rect.size
+	shape.position = rect.get_center()
+
+
 func hitbox_rect() -> Rect2:
-	var size: Vector2 = hitbox.shape.size
-	return Rect2(hitbox.global_position - size / 2.0, size)
+	var bounds := _shape_rect(hitbox)
+	for extra in _extra_hitboxes:
+		if not extra.is_queued_for_deletion():
+			bounds = bounds.merge(_shape_rect(extra))
+	return bounds
+
+
+func _shape_rect(shape: CollisionShape2D) -> Rect2:
+	var size: Vector2 = shape.shape.size
+	return Rect2(shape.global_position - size / 2.0, size)
 
 
 func _sounds_in(dir: String) -> Array[AudioStream]:
@@ -183,7 +212,10 @@ func _fly(delta: float) -> void:
 		velocity.y = minf(velocity.y + mode.flight_gravity * delta, mode.max_fall_speed)
 	if Input.is_action_just_pressed("jump"):
 		_hover_time = 0.0
-		velocity.y = -mode.flap_velocity
+		var rise := mode.flap_velocity
+		if velocity.y < 0.0:
+			rise = clampf(-velocity.y + mode.flap_stack_boost, mode.flap_velocity, mode.max_rise_speed)
+		velocity.y = -rise
 		sprite.rotation_degrees = mode.flap_tilt_degrees
 		_play_random(jump_player, jump_sounds)
 	elif velocity.y > 0.0:
