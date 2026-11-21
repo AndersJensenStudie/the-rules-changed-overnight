@@ -1,13 +1,22 @@
 [gd_scene format=3]
 
-[ext_resource type="Script" path="res://obstacle.gd" id="1_obst"]
+[ext_resource type="Script" path="res://night.gd" id="1_night"]
 [ext_resource type="Texture2D" path="res://assets/images/night.png" id="2_night"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_pass"]
+size = Vector2(27, 200)
+
 [node name="Night" type="Area2D"]
-script = ExtResource("1_obst")
+script = ExtResource("1_night")
 
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
 polygon = PackedVector2Array(3, -13, 9, -11, 13, -7, 15, -3, 15, 5, 11, 11, 5, 14, -3, 14, -10, 10, -12, 5, -5, 8, 4, 7, 8, 2, 8, -3, 6, -8, 2, -11)
 
 [node name="Sprite2D" type="Sprite2D" parent="."]
 texture = ExtResource("2_night")
+
+[node name="PassZone" type="Area2D" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PassZone"]
+position = Vector2(1.5, -113)
+shape = SubResource("RectangleShape2D_pass")

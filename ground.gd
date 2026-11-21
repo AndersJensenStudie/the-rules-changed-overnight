@@ -2,15 +2,22 @@ extends Node2D
 
 @export var width := 250.0
 @export var color := Color(0.33, 0.33, 0.33)
+@export var moon_color := Color(0.75, 0.75, 0.8)
 
 var speed := 0.0
 var _offset := 0.0
 var _pebbles: Array[Vector2] = []
+@onready var _earth_color := color
 
 
 func _ready() -> void:
 	for i in 24:
 		_pebbles.append(Vector2(randf() * width, randf_range(3.0, 8.0)))
+
+
+func set_moon(on: bool) -> void:
+	color = moon_color if on else _earth_color
+	queue_redraw()
 
 
 func _process(delta: float) -> void:

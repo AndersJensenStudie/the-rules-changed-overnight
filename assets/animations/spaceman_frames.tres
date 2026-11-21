@@ -1,0 +1,150 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://dfhhykpesysml" path="res://assets/images/bloodsplatter.png" id="1_blood"]
+[ext_resource type="Texture2D" uid="uid://bxmk3mq5xodva" path="res://assets/images/Spaceman.png" id="2_spaceman"]
+
+[sub_resource type="AtlasTexture" id="die_0"]
+atlas = ExtResource("1_blood")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_1"]
+atlas = ExtResource("1_blood")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_2"]
+atlas = ExtResource("1_blood")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_3"]
+atlas = ExtResource("1_blood")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_4"]
+atlas = ExtResource("1_blood")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_5"]
+atlas = ExtResource("1_blood")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_6"]
+atlas = ExtResource("1_blood")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_0"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_1"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_2"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_3"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_4"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_5"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_6"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_7"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(32, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_8"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(64, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_9"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(0, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_10"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(32, 96, 32, 32)
+
+[sub_resource type="AtlasTexture" id="walk_11"]
+atlas = ExtResource("2_spaceman")
+region = Rect2(64, 96, 32, 32)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("die_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_6")
+}],
+"loop": 0,
+"name": &"die",
+"speed": 30.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("walk_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_6")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_7")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_8")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_9")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_10")
+}, {
+"duration": 1.0,
+"texture": SubResource("walk_11")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 8.0
+}]

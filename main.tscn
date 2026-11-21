@@ -5,9 +5,16 @@
 [ext_resource type="PackedScene" uid="uid://baw5ubhq3kjlq" path="res://stage.tscn" id="2_0xm2m"]
 [ext_resource type="Script" uid="uid://br7frjenbuf6g" path="res://cactus_spawner.gd" id="3_spawn"]
 [ext_resource type="Script" uid="uid://cjfjgvvgrh30p" path="res://ground.gd" id="4_ground"]
+[ext_resource type="Texture2D" uid="uid://837d3qjrl6lx" path="res://assets/images/backdrops/bg-space.png" id="5_backdrop"]
 
 [node name="main" type="Node2D" unique_id=1252278135]
 script = ExtResource("0_main")
+
+[node name="Backdrop" type="Sprite2D" parent="."]
+visible = false
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("5_backdrop")
+centered = false
 
 [node name="Stage" parent="." unique_id=752080561 instance=ExtResource("2_0xm2m")]
 position = Vector2(69, 2)
