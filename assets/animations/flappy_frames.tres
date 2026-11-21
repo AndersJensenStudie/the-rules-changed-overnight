@@ -1,0 +1,108 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://dfhhykpesysml" path="res://assets/images/bloodsplatter.png" id="1_blood"]
+[ext_resource type="Texture2D" uid="uid://dcr8rnh12falu" path="res://assets/images/flappers.png" id="2_bird"]
+
+[sub_resource type="AtlasTexture" id="die_0"]
+atlas = ExtResource("1_blood")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_1"]
+atlas = ExtResource("1_blood")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_2"]
+atlas = ExtResource("1_blood")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_3"]
+atlas = ExtResource("1_blood")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_4"]
+atlas = ExtResource("1_blood")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_5"]
+atlas = ExtResource("1_blood")
+region = Rect2(64, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="die_6"]
+atlas = ExtResource("1_blood")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="fly_0"]
+atlas = ExtResource("2_bird")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="fly_1"]
+atlas = ExtResource("2_bird")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="fly_2"]
+atlas = ExtResource("2_bird")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="fly_3"]
+atlas = ExtResource("2_bird")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="fly_4"]
+atlas = ExtResource("2_bird")
+region = Rect2(0, 64, 32, 32)
+
+[sub_resource type="AtlasTexture" id="fly_5"]
+atlas = ExtResource("2_bird")
+region = Rect2(32, 64, 32, 32)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("die_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_5")
+}, {
+"duration": 1.0,
+"texture": SubResource("die_6")
+}],
+"loop": 0,
+"name": &"die",
+"speed": 30.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("fly_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("fly_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("fly_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("fly_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("fly_4")
+}, {
+"duration": 1.0,
+"texture": SubResource("fly_5")
+}],
+"loop": true,
+"name": &"fly",
+"speed": 10.0
+}]

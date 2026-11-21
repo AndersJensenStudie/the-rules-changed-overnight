@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="ModeSettings" format=3]
+
+[ext_resource type="Script" path="res://mode_settings.gd" id="1_script"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/flappy_frames.tres" id="2_frames"]
+[ext_resource type="SpriteFrames" path="res://assets/animations/dino_backdrop_frames.tres" id="3_backdrop"]
+[ext_resource type="AudioStream" path="res://assets/music/basic.wav" id="4_music"]
+
+[resource]
+script = ExtResource("1_script")
+mode_name = "flappy"
+sprite_frames = ExtResource("2_frames")
+sprite_position = Vector2(-2, 10)
+run_animation = &"fly"
+hitbox_size = Vector2(18, 11)
+jump_sounds_dir = "res://assets/sounds/flappy_flap"
+death_sounds_dir = "res://assets/sounds/death"
+obstacles = 3
+min_gap_seconds = 1.2
+max_gap_seconds = 1.8
+night_y_range = Vector2(60, 180)
+flight = true
+flap_velocity = 190.0
+flight_gravity = 700.0
+max_fall_speed = 300.0
+floor_kills = true
+entry_hover_time = 0.5
+flap_tilt_degrees = -25.0
+dive_tilt_degrees = 70.0
+dive_tilt_speed = 200.0
+backdrop_frames = ExtResource("3_backdrop")
+ground_color = Color(0.33, 0.33, 0.33, 1)
+label_color = Color(0.33, 0.33, 0.33, 1)
+music = ExtResource("4_music")

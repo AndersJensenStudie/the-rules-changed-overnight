@@ -13,7 +13,6 @@ signal mushroom_collected
 @export var max_group_size := 3
 @export var night_scene: PackedScene = preload("res://night.tscn")
 @export var night_every := 10
-@export var night_y := 200.0
 @export var night_width := 28.0
 @export var asteroid_scene: PackedScene = preload("res://asteroid.tscn")
 @export var max_asteroid_group_size := 2
@@ -34,6 +33,10 @@ signal mushroom_collected
 @export var coin_above_pipe_offset := 14.0
 @export var coin_arc_heights: Array[float] = [34.0, 50.0, 34.0]
 @export var coin_arc_spacing := 18.0
+@export var ceiling_y := 0.0
+@export var pipe_pair_gap := 70.0
+@export var pipe_pair_center_range := Vector2(60.0, 195.0)
+@export var pipe_pair_max_shift := 60.0
 
 var speed := 0.0:
 	set(value):
@@ -45,6 +48,7 @@ var running := false
 var mode: ModeSettings
 var _distance_to_next := 0.0
 var _rolls_since_night := 0
+var _last_gap_center := 130.0
 
 
 func start() -> void:
@@ -85,11 +89,14 @@ func _spawn_group() -> float:
 			return _spawn_asteroids()
 		ModeSettings.Obstacles.PIPES:
 			return _spawn_pipe()
+		ModeSettings.Obstacles.PIPE_PAIRS:
+			return _spawn_pipe_pair()
 	return _spawn_cacti()
 
 
 func _spawn_night() -> float:
-	var night := _spawn(night_scene, Vector2(spawn_x, night_y))
+	var y := randf_range(mode.night_y_range.x, mode.night_y_range.y)
+	var night := _spawn(night_scene, Vector2(spawn_x, y))
 	night.passed_over.connect(moon_passed.emit)
 	return night_width
 
@@ -137,6 +144,33 @@ func _spawn_pipe() -> float:
 		for i in coin_arc_heights.size():
 			_spawn_coin(Vector2(first + i * coin_arc_spacing, floor_y - coin_arc_heights[i]))
 	return pipe.width
+
+
+func _spawn_pipe_pair() -> float:
+	var low := maxf(pipe_pair_center_range.x, _last_gap_center - pipe_pair_max_shift)
+	var high := minf(pipe_pair_center_range.y, _last_gap_center + pipe_pair_max_shift)
+	var center := randf_range(low, high)
+	_last_gap_center = center
+	var bottom := pipe_scene.instantiate()
+	bottom.height = floor_y - (center + pipe_pair_gap / 2.0)
+	bottom.solid_top = false
+	var top := pipe_scene.instantiate()
+	top.height = (center - pipe_pair_gap / 2.0) - ceiling_y
+	top.solid_top = false
+	top.flipped = true
+	var center_x: float = spawn_x + bottom.width / 2.0
+	for pipe in [bottom, top]:
+		pipe.add_to_group("pipe_pair")
+		pipe.set_meta("gap_center", center)
+	_add_obstacle(bottom, Vector2(center_x, floor_y))
+	_add_obstacle(top, Vector2(center_x, ceiling_y))
+	return bottom.width
+
+
+func clear_pipe_pairs_ahead(x: float) -> void:
+	for pipe in get_tree().get_nodes_in_group("pipe_pair"):
+		if pipe.get_parent() == self and pipe.global_position.x - pipe.width / 2.0 > x:
+			pipe.queue_free()
 
 
 func _spawn_coin(pos: Vector2) -> void:

@@ -27,6 +27,7 @@ const HIGH_SCORE_PATH := "user://highscore.save"
 	preload("res://assets/modes/earth.tres"),
 	preload("res://assets/modes/moon.tres"),
 	preload("res://assets/modes/mario.tres"),
+	preload("res://assets/modes/flappy.tres"),
 ]
 
 var state := State.READY
@@ -48,6 +49,7 @@ var _still_backdrops := {}
 @onready var ground: Node2D = $Ground
 @onready var message_label: Label = $HUD/MessageLabel
 @onready var backdrop: AnimatedSprite2D = $Backdrop
+@onready var decorations: Node2D = $Decorations
 @onready var coin_sound: AudioStreamPlayer = $CoinSound
 @onready var hit_sound: AudioStreamPlayer = $HitSound
 @onready var score_label: Label = $HUD/ScoreLabel
@@ -57,6 +59,7 @@ var _still_backdrops := {}
 
 func _ready() -> void:
 	spawner.player_hit.connect(_game_over)
+	player.hit_ground.connect(_game_over)
 	spawner.moon_passed.connect(_on_moon_passed)
 	spawner.coin_collected.connect(_on_coin_collected)
 	for file in ResourceLoader.list_directory(coin_sounds_dir):
@@ -191,15 +194,26 @@ func _save_high_score() -> void:
 func _set_mode(index: int, instant := false) -> void:
 	if index == mode_index:
 		return
+	var leaving_pipe_pairs := mode_index >= 0 and modes[mode_index].obstacles == ModeSettings.Obstacles.PIPE_PAIRS
 	mode_index = index
 	var settings := modes[index]
+	if leaving_pipe_pairs and settings.obstacles != ModeSettings.Obstacles.PIPE_PAIRS:
+		spawner.clear_pipe_pairs_ahead(player.hitbox_rect().end.x)
 	player.apply_mode(settings)
 	spawner.apply_mode(settings)
 	ground.apply_mode(settings)
 	for label in [message_label, score_label, high_score_label]:
 		label.add_theme_color_override("font_color", settings.label_color)
 	_show_backdrop(_backdrop_frames_for(settings), instant)
+	_show_decorations(settings.decorations)
 	Music.apply_mode(settings)
+
+
+func _show_decorations(scenes: Array[PackedScene]) -> void:
+	for child in decorations.get_children():
+		child.queue_free()
+	for scene in scenes:
+		decorations.add_child(scene.instantiate())
 
 
 func _backdrop_frames_for(settings: ModeSettings) -> SpriteFrames:

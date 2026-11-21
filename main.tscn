@@ -13,6 +13,8 @@ script = ExtResource("0_main")
 visible = false
 centered = false
 
+[node name="Decorations" type="Node2D" parent="."]
+
 [node name="Stage" parent="." unique_id=752080561 instance=ExtResource("2_0xm2m")]
 position = Vector2(69, 2)
 

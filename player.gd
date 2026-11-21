@@ -1,6 +1,7 @@
 extends CharacterBody2D
 
 signal revived
+signal hit_ground
 
 @export var speed := 300.0
 
@@ -30,6 +31,7 @@ var mode: ModeSettings
 var _home_x := 0.0
 var _sound_cache := {}
 var _invincible_time := 0.0
+var _hover_time := 0.0
 
 
 func _ready() -> void:
@@ -54,13 +56,18 @@ func apply_mode(settings: ModeSettings) -> void:
 		return
 	mode = settings
 	_recalc_jump(settings.jump_height, settings.time_to_peak, settings.time_to_fall)
-	var animation := sprite.animation
+	var animation := &"die" if sprite.animation == &"die" else settings.run_animation
 	var playing := sprite.is_playing()
 	sprite.sprite_frames = settings.sprite_frames
 	sprite.position = settings.sprite_position
 	sprite.animation = animation
 	if playing:
 		sprite.play()
+	sprite.rotation = 0.0
+	_hover_time = 0.0
+	if settings.flight:
+		velocity.y = 0.0
+		_hover_time = settings.entry_hover_time
 	hitbox.shape.size = settings.hitbox_size
 	hitbox.position.y = feet_y - settings.hitbox_size.y / 2.0
 	jump_sounds = _sounds_in(settings.jump_sounds_dir)
@@ -91,13 +98,13 @@ func _setup_player(audio_player: AudioStreamPlayer, volume_db: float) -> void:
 
 
 func idle() -> void:
-	$AnimatedSprite2D.animation = &"walk"
-	$AnimatedSprite2D.stop()
-	$AnimatedSprite2D.frame = 0
+	sprite.animation = mode.run_animation
+	sprite.stop()
+	sprite.frame = 0
 
 
 func run() -> void:
-	$AnimatedSprite2D.play("walk")
+	sprite.play(mode.run_animation)
 
 
 func revive() -> void:
@@ -106,7 +113,9 @@ func revive() -> void:
 	sprite.play_backwards("die")
 	await sprite.animation_finished
 	set_physics_process(true)
-	sprite.play("walk")
+	sprite.play(mode.run_animation)
+	if mode.flight:
+		_hover_time = mode.entry_hover_time
 	revived.emit()
 
 
@@ -136,6 +145,9 @@ func die() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if mode.flight:
+		_fly(delta)
+		return
 	if not is_on_floor():
 		var g := jump_gravity if velocity.y < 0.0 else fall_gravity
 		velocity.y += g * delta
@@ -161,6 +173,25 @@ func _physics_process(delta: float) -> void:
 
 	move_and_slide()
 	position.x = _home_x
+
+
+func _fly(delta: float) -> void:
+	if _hover_time > 0.0:
+		_hover_time -= delta
+		velocity.y = 0.0
+	else:
+		velocity.y = minf(velocity.y + mode.flight_gravity * delta, mode.max_fall_speed)
+	if Input.is_action_just_pressed("jump"):
+		_hover_time = 0.0
+		velocity.y = -mode.flap_velocity
+		sprite.rotation_degrees = mode.flap_tilt_degrees
+		_play_random(jump_player, jump_sounds)
+	elif velocity.y > 0.0:
+		sprite.rotation_degrees = move_toward(sprite.rotation_degrees, mode.dive_tilt_degrees, mode.dive_tilt_speed * delta)
+	move_and_slide()
+	position.x = _home_x
+	if mode.floor_kills and is_on_floor() and not is_invincible():
+		hit_ground.emit()
 
 
 func _play_random(audio_player: AudioStreamPlayer, sounds: Array[AudioStream]) -> void:

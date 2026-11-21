@@ -1,0 +1,46 @@
+[gd_resource type="SpriteFrames" format=3]
+
+[ext_resource type="Texture2D" uid="uid://blcs5c6kriilw" path="res://assets/images/ufo.png" id="1_ufo"]
+
+[sub_resource type="AtlasTexture" id="frame_0"]
+atlas = ExtResource("1_ufo")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="frame_1"]
+atlas = ExtResource("1_ufo")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="frame_2"]
+atlas = ExtResource("1_ufo")
+region = Rect2(0, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="frame_3"]
+atlas = ExtResource("1_ufo")
+region = Rect2(32, 32, 32, 32)
+
+[sub_resource type="AtlasTexture" id="frame_4"]
+atlas = ExtResource("1_ufo")
+region = Rect2(0, 64, 32, 32)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("frame_0")
+}, {
+"duration": 1.0,
+"texture": SubResource("frame_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("frame_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("frame_3")
+}, {
+"duration": 1.0,
+"texture": SubResource("frame_4")
+}],
+"loop": true,
+"name": &"default",
+"speed": 8.0
+}]

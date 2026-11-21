@@ -25,6 +25,10 @@ window/size/viewport_width=250
 window/size/viewport_height=250
 window/stretch/mode="canvas_items"
 
+[gui]
+
+theme/custom_font="res://assets/fonts/Super Arcade.ttf"
+
 [input]
 
 jump={
