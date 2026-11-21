@@ -128,7 +128,7 @@ func _update_speed(delta: float) -> void:
 
 
 func _on_feather_collected() -> void:
-	player.start_invincibility(feather_time, true)
+	player.start_invincibility(feather_time)
 
 
 func _on_hourglass_collected() -> void:
