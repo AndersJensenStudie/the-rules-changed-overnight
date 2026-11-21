@@ -12,6 +12,7 @@ const HIGH_SCORE_PATH := "user://highscore.save"
 @export var slow_duration := 5.0
 @export var slow_ramp_time := 0.4
 @export var slow_music_scale := 0.7
+@export var feather_time := 5.0
 @export var restart_delay := 0.4
 @export var backdrop_fade_time := 0.3
 @export var score_per_second := 1.0
@@ -75,6 +76,7 @@ func _ready() -> void:
 			coin_sounds.append(stream)
 	spawner.mushroom_collected.connect(_on_mushroom_collected)
 	spawner.hourglass_collected.connect(_on_hourglass_collected)
+	spawner.feather_collected.connect(_on_feather_collected)
 	Music.set_speed_scale(1.0)
 	hp_label.add_theme_color_override("font_color", hp_color)
 	hp_label.add_theme_color_override("font_outline_color", hp_outline_color)
@@ -123,6 +125,10 @@ func _update_speed(delta: float) -> void:
 		factor = clampf(speed / start_speed, slow_factor, 1.0)
 	spawner.world_time_scale = factor
 	Music.set_speed_scale(lerpf(slow_music_scale, 1.0, inverse_lerp(slow_factor, 1.0, factor)))
+
+
+func _on_feather_collected() -> void:
+	player.start_invincibility(feather_time, true)
 
 
 func _on_hourglass_collected() -> void:

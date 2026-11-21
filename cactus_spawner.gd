@@ -6,6 +6,7 @@ signal coin_collected
 signal mushroom_collected
 signal obstacle_spawned
 signal hourglass_collected
+signal feather_collected
 
 @export var default_mode: ModeSettings = preload("res://assets/modes/earth.tres")
 @export var obstacle_scene: PackedScene = preload("res://obstacle.tscn")
@@ -52,6 +53,9 @@ signal hourglass_collected
 @export var hourglass_margin := 8.0
 @export var hourglass_half_height := 10.0
 @export var hourglass_min_y := 30.0
+@export var feather_scene: PackedScene = preload("res://feather.tscn")
+@export var feather_chance := 0.125
+@export var feather_height_spread := 10.0
 
 var speed := 0.0:
 	set(value):
@@ -214,6 +218,9 @@ func _spawn_pipe_pair() -> float:
 		pipe.set_meta("gap_center", center)
 	_add_obstacle(bottom, Vector2(center_x, floor_y))
 	_add_obstacle(top, Vector2(center_x, ceiling_y))
+	if randf() < feather_chance:
+		var feather_y := center + randf_range(-feather_height_spread, feather_height_spread)
+		_spawn_pickup(feather_scene, Vector2(center_x, feather_y), feather_collected)
 	return bottom.width
 
 

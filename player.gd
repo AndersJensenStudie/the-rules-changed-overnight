@@ -14,6 +14,7 @@ signal hit_ground
 @export var death_volume_db := 8.0
 @export var blink_interval := 0.1
 @export var bounce_factor := 0.6
+@export var ghost_alpha := 0.5
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var hitbox: CollisionShape2D = $CollisionShape2D
@@ -32,6 +33,7 @@ var mode: ModeSettings
 var _home_x := 0.0
 var _sound_cache := {}
 var _invincible_time := 0.0
+var _ghost := false
 var _hover_time := 0.0
 var _extra_hitboxes: Array[CollisionShape2D] = []
 
@@ -153,8 +155,13 @@ func bounce() -> void:
 	velocity.y = jump_velocity * bounce_factor
 
 
-func start_invincibility(duration: float) -> void:
+func start_invincibility(duration: float, ghost := false) -> void:
+	if duration < _invincible_time:
+		return
 	_invincible_time = duration
+	_ghost = ghost
+	sprite.visible = true
+	sprite.modulate.a = ghost_alpha if ghost else 1.0
 
 
 func is_invincible() -> bool:
@@ -167,7 +174,9 @@ func _process(delta: float) -> void:
 	_invincible_time -= delta
 	if _invincible_time <= 0.0:
 		sprite.visible = true
-	else:
+		sprite.modulate.a = 1.0
+		_ghost = false
+	elif not _ghost:
 		sprite.visible = fmod(_invincible_time, blink_interval * 2.0) > blink_interval
 
 
