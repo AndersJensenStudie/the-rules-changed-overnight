@@ -74,7 +74,7 @@ func _ready() -> void:
 	_update_score_labels()
 	_set_mode(0, true)
 	player.idle()
-	message_label.text = "Press SPACE to start"
+	message_label.text = "Press SPAcE to start"
 
 
 func _process(delta: float) -> void:
@@ -146,7 +146,8 @@ func _show_popup(text: String) -> void:
 	var popup := Label.new()
 	popup.text = text
 	popup.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	popup.add_theme_font_size_override("font_size", 10)
+	popup.add_theme_font_size_override("font_size", 12)
+	popup.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	popup.add_theme_color_override("font_color", popup_color)
 	popup.add_theme_color_override("font_outline_color", popup_outline_color)
 	popup.add_theme_constant_override("outline_size", 2)
@@ -266,7 +267,7 @@ func _game_over(obstacle: Node2D = null) -> void:
 	ground.speed = 0.0
 	player.die()
 	_save_high_score()
-	message_label.text = "GAME OVER\nPress SPACE to restart"
+	message_label.text = "GAME OVER\nPress SPAcE to restart"
 
 
 func _revive() -> void:

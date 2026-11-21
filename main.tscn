@@ -32,38 +32,42 @@ position = Vector2(40, 200)
 [node name="HUD" type="CanvasLayer" parent="." unique_id=522879554]
 
 [node name="MessageLabel" type="Label" parent="HUD" unique_id=1328029335]
-offset_top = 90.0
+offset_top = 78.0
 offset_right = 250.0
 offset_bottom = 130.0
-theme_override_colors/font_color = Color(0.33, 0.33, 0.33, 1)
-theme_override_font_sizes/font_size = 10
+texture_filter = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="HighScoreLabel" type="Label" parent="HUD" unique_id=928235352]
 offset_left = 140.0
 offset_top = 2.0
-offset_right = 244.0
-offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.33, 0.33, 0.33, 1)
-theme_override_font_sizes/font_size = 10
+offset_right = 246.0
+offset_bottom = 16.0
+texture_filter = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 2
 
 [node name="HPLabel" type="Label" parent="HUD" unique_id=478150940]
 offset_left = 60.0
 offset_top = 2.0
 offset_right = 130.0
-offset_bottom = 15.0
-theme_override_font_sizes/font_size = 10
+offset_bottom = 16.0
+texture_filter = 4
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 2
 
 [node name="ScoreLabel" type="Label" parent="HUD" unique_id=859137020]
 offset_left = 140.0
-offset_top = 14.0
-offset_right = 244.0
-offset_bottom = 27.0
-theme_override_colors/font_color = Color(0.33, 0.33, 0.33, 1)
-theme_override_font_sizes/font_size = 10
+offset_top = 16.0
+offset_right = 246.0
+offset_bottom = 30.0
+texture_filter = 4
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 12
 horizontal_alignment = 2
 
 [node name="CoinSound" type="AudioStreamPlayer" parent="." unique_id=404306216]

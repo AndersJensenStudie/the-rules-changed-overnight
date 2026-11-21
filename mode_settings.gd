@@ -38,7 +38,7 @@ enum Obstacles { CACTI, ASTEROIDS, PIPES, PIPE_PAIRS }
 @export var backdrop_frames: SpriteFrames
 @export var decorations: Array[PackedScene] = []
 @export var ground_color := Color(0.33, 0.33, 0.33)
-@export var label_color := Color(0.33, 0.33, 0.33)
+@export var label_color := Color(1, 1, 1)
 @export_group("Sound")
 @export var music: AudioStream
 @export var ambient: AudioStream

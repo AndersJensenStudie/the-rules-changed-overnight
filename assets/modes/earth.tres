@@ -1,25 +1,14 @@
-[gd_resource type="Resource" script_class="ModeSettings" format=3]
+[gd_resource type="Resource" script_class="ModeSettings" format=3 uid="uid://8gxp462nsn2e"]
 
-[ext_resource type="Script" path="res://mode_settings.gd" id="1_script"]
-[ext_resource type="SpriteFrames" path="res://assets/animations/dino_frames.tres" id="2_frames"]
-[ext_resource type="AudioStream" path="res://assets/music/basic.wav" id="3_music"]
-[ext_resource type="SpriteFrames" path="res://assets/animations/dino_backdrop_frames.tres" id="4_backdrop"]
+[ext_resource type="Script" uid="uid://glp3yxydk23g" path="res://mode_settings.gd" id="1_script"]
+[ext_resource type="SpriteFrames" uid="uid://bsh8phmyj7qe7" path="res://assets/animations/dino_frames.tres" id="2_frames"]
+[ext_resource type="AudioStream" uid="uid://cia1ud4lnwh43" path="res://assets/music/basic.wav" id="3_music"]
+[ext_resource type="SpriteFrames" uid="uid://cr13dtlkqpp3u" path="res://assets/animations/dino_backdrop_frames.tres" id="4_backdrop"]
 
 [resource]
 script = ExtResource("1_script")
 mode_name = "earth"
-jump_height = 84.0
-time_to_peak = 0.25
-time_to_fall = 0.26
 sprite_frames = ExtResource("2_frames")
-sprite_position = Vector2(4, -1)
-hitbox_size = Vector2(24, 26)
 hitbox_rects = Array[Rect2]([Rect2(-11, -9, 22, 17), Rect2(-7, 8, 9, 7)])
-jump_sounds_dir = "res://assets/sounds/jump_sounds"
-obstacles = 0
-min_gap_seconds = 0.8
-max_gap_seconds = 1.8
 backdrop_frames = ExtResource("4_backdrop")
-ground_color = Color(0.33, 0.33, 0.33, 1)
-label_color = Color(0.33, 0.33, 0.33, 1)
 music = ExtResource("3_music")
